@@ -1,6 +1,8 @@
 ﻿using CS321_W2D2_StudentAPI.Models;
 using CS321_W2D2_StudentAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace CS321_W2D2_StudentAPI.Controllers
 {
@@ -11,9 +13,10 @@ namespace CS321_W2D2_StudentAPI.Controllers
         private readonly IStudentsService _studentsService;
 
         // Constructor
-        public StudentsController(/* HINT: what parameter is necessary to inject the service? */)
+        public StudentsController(IStudentsService studentsService)
         {
             // HINT: keep a reference to the incoming service
+            _studentsService = studentsService;
         }
 
         // get all students
@@ -21,8 +24,9 @@ namespace CS321_W2D2_StudentAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
+            var student =_studentsService.GetAll();
             // return OK 200 status and list of students
-            return Ok(_studentsService.GetAll());
+            return Ok(student);
         }
 
         // get specific student by id
@@ -43,13 +47,20 @@ namespace CS321_W2D2_StudentAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Student newStudent)
         {
-            // add the new student
-            _studentsService.Add(newStudent);
-
+            try
+            {
+                // add the new student
+                _studentsService.Add(newStudent);
+            }
+            catch (System.Exception ex)
+            {
+                ModelState.AddModelError("AddStudent", ex.Message);
+                return BadRequest(ModelState);
+            }
             // return a 201 Created status. This will also add a "location" header
             // with the URI of the new student. E.g., /api/students/99, if the new is 99
             return CreatedAtAction("Get", new { Id = newStudent.Id }, newStudent);
-        }
+         }
 
         // update an existing student
         // PUT api/students/:id
