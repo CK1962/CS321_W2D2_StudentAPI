@@ -86,13 +86,16 @@ namespace CS321_W2D2_StudentAPI.Services
             return currentStudent;
         }
 
-        public IActionResult Delete(int id)
+        public void Delete(int id)
         {
             var  students = _students.FirstOrDefault(s => s.Id == id);
             // remove student
             _students.Remove(students);
+        }
 
-            return NoContent();
+        public void Remove(Student student)
+        {
+            throw new NotImplementedException();
         }
     }
 }
